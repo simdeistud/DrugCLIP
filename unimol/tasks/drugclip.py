@@ -18,6 +18,7 @@ from unicore.data import (AppendTokenDataset, Dictionary, EpochShuffleDataset,
                           PrependTokenDataset, RawArrayDataset,LMDBDataset, RawLabelDataset,
                           RightPadDataset, RightPadDataset2D, TokenizeDataset,SortDataset,data_utils)
 from unicore.tasks import UnicoreTask, register_task
+from unimol.utils.inference import move_to_device
 from unimol.data import (AffinityDataset, CroppingPocketDataset,
                          CrossDistanceDataset, DistanceDataset,
                          EdgeTypeDataset, KeyDataset, LengthDataset,
@@ -616,6 +617,7 @@ class DrugCLIP(UnicoreTask):
         return loss, sample_size, logging_output
 
 
+    @torch.no_grad()
     def test_pcba_target(self, name, model, **kwargs):
         """Encode a dataset with the molecule encoder."""
 
@@ -633,7 +635,7 @@ class DrugCLIP(UnicoreTask):
         
         mol_data = torch.utils.data.DataLoader(mol_dataset, batch_size=bsz, collate_fn=mol_dataset.collater)
         for _, sample in enumerate(tqdm(mol_data)):
-            sample = unicore.utils.move_to_cuda(sample)
+            sample = move_to_device(sample, next(model.parameters()).device)
             dist = sample["net_input"]["mol_src_distance"]
             et = sample["net_input"]["mol_src_edge_type"]
             st = sample["net_input"]["mol_src_tokens"]
@@ -666,7 +668,7 @@ class DrugCLIP(UnicoreTask):
         pocket_reps = []
 
         for _, sample in enumerate(tqdm(pocket_data)):
-            sample = unicore.utils.move_to_cuda(sample)
+            sample = move_to_device(sample, next(model.parameters()).device)
             dist = sample["net_input"]["pocket_src_distance"]
             et = sample["net_input"]["pocket_src_edge_type"]
             st = sample["net_input"]["pocket_src_tokens"]
@@ -757,6 +759,7 @@ class DrugCLIP(UnicoreTask):
 
         return 
     
+    @torch.no_grad()
     def test_dude_target(self, target, model, **kwargs):
 
         data_path = "./data/DUD-E/raw/all/" + target + "/mols.lmdb"
@@ -772,7 +775,7 @@ class DrugCLIP(UnicoreTask):
         
         mol_data = torch.utils.data.DataLoader(mol_dataset, batch_size=bsz, collate_fn=mol_dataset.collater)
         for _, sample in enumerate(tqdm(mol_data)):
-            sample = unicore.utils.move_to_cuda(sample)
+            sample = move_to_device(sample, next(model.parameters()).device)
             dist = sample["net_input"]["mol_src_distance"]
             et = sample["net_input"]["mol_src_edge_type"]
             st = sample["net_input"]["mol_src_tokens"]
@@ -806,7 +809,7 @@ class DrugCLIP(UnicoreTask):
         pocket_reps = []
 
         for _, sample in enumerate(tqdm(pocket_data)):
-            sample = unicore.utils.move_to_cuda(sample)
+            sample = move_to_device(sample, next(model.parameters()).device)
             dist = sample["net_input"]["pocket_src_distance"]
             et = sample["net_input"]["pocket_src_edge_type"]
             st = sample["net_input"]["pocket_src_tokens"]
@@ -893,6 +896,7 @@ class DrugCLIP(UnicoreTask):
     
     
     
+    @torch.no_grad()
     def encode_mols_once(self, model, data_path, emb_dir, atoms, coords, **kwargs):
         
         # cache path is embdir/data_path.pkl
@@ -910,7 +914,7 @@ class DrugCLIP(UnicoreTask):
         bsz=32
         mol_data = torch.utils.data.DataLoader(mol_dataset, batch_size=bsz, collate_fn=mol_dataset.collater)
         for _, sample in enumerate(tqdm(mol_data)):
-            sample = unicore.utils.move_to_cuda(sample)
+            sample = move_to_device(sample, next(model.parameters()).device)
             dist = sample["net_input"]["mol_src_distance"]
             et = sample["net_input"]["mol_src_edge_type"]
             st = sample["net_input"]["mol_src_tokens"]
@@ -941,6 +945,7 @@ class DrugCLIP(UnicoreTask):
 
         return mol_reps, mol_names
     
+    @torch.no_grad()
     def retrieve_mols(self, model, mol_path, pocket_path, emb_dir, k, **kwargs):
  
         os.makedirs(emb_dir, exist_ok=True)        
@@ -951,7 +956,7 @@ class DrugCLIP(UnicoreTask):
         pocket_reps = []
         pocket_names = []
         for _, sample in enumerate(tqdm(pocket_data)):
-            sample = unicore.utils.move_to_cuda(sample)
+            sample = move_to_device(sample, next(model.parameters()).device)
             dist = sample["net_input"]["pocket_src_distance"]
             et = sample["net_input"]["pocket_src_edge_type"]
             st = sample["net_input"]["pocket_src_tokens"]

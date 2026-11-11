@@ -7,14 +7,14 @@
 import logging
 import os
 import sys
-import pickle
 import torch
-from unicore import checkpoint_utils, distributed_utils, options, utils
-from unicore.logging import progress_bar
+from unicore import checkpoint_utils, options
 from unicore import tasks
-import numpy as np
-from tqdm import tqdm
-import unicore
+
+if __package__:
+    from .utils.inference import add_device_args, inference_device
+else:
+    from utils.inference import add_device_args, inference_device
 
 logging.basicConfig(
     format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
@@ -25,20 +25,9 @@ logging.basicConfig(
 logger = logging.getLogger("unimol.inference")
 
 
-#from skchem.metrics import bedroc_score
-from rdkit.ML.Scoring.Scoring import CalcBEDROC, CalcAUC, CalcEnrichment
-from sklearn.metrics import roc_curve
-
-
-
+@torch.no_grad()
 def main(args):
-
-    use_fp16 = args.fp16
-    use_cuda = torch.cuda.is_available() and not args.cpu
-
-    if use_cuda:
-        torch.cuda.set_device(args.device_id)
-
+    device = inference_device(args, logger)
 
     # Load model
     logger.info("loading model(s) from {}".format(args.path))
@@ -47,11 +36,10 @@ def main(args):
     model = task.build_model(args)
     model.load_state_dict(state["model"], strict=False)
 
-    # Move models to GPU
-    if use_fp16:
+    model.float()
+    if args.fp16:
         model.half()
-    if use_cuda:
-        model.cuda()
+    model.to(device)
 
     # Print args
     logger.info(args)
@@ -72,13 +60,14 @@ def cli_main():
     
 
     parser = options.get_validation_parser()
+    add_device_args(parser)
     parser.add_argument("--mol-path", type=str, default="", help="path for mol data")
     parser.add_argument("--pocket-path", type=str, default="", help="path for pocket data")
     parser.add_argument("--emb-dir", type=str, default="", help="path for saved embedding data")
     options.add_model_args(parser)
     args = options.parse_args_and_arch(parser)
 
-    distributed_utils.call_main(args, main)
+    main(args)
 
 
 if __name__ == "__main__":
