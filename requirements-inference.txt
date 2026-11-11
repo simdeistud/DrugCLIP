@@ -1,0 +1,14 @@
+# Install a PyTorch build for your hardware separately, then UniCore (see README).
+numpy<2
+scipy
+pandas
+scikit-learn
+rdkit==2022.9.5
+ipython
+iopath
+lmdb
+ml-collections
+tensorboardX
+tqdm
+tokenizers
+wandb
