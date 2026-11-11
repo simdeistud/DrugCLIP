@@ -71,15 +71,6 @@ Molecule embeddings remain cached as NumPy arrays and final scoring remains on
 CPU. Use a fresh `--emb-dir` when comparing devices or precision modes so existing
 cached embeddings do not affect the comparison.
 
-`--num-workers N` controls the preprocessing worker processes for both molecule
-and pocket inference loaders, including retrieval, DUDE, and PCBA. Use
-`--num-workers 0` to preprocess in the main process. This setting is separate
-from PyTorch's CPU compute thread count. More workers can overlap preprocessing
-with model execution, but process startup and communication can outweigh the
-benefit for small inputs, especially on platforms that spawn worker processes.
-The example launchers retain their existing setting of eight workers; append
-`--num-workers N` to override it.
-
 The benchmark entry point retains the existing data layouts:
 `./data/DUD-E/raw/all/<target>/mols.lmdb` and `pocket.lmdb`, or
 `./data/lit_pcba/<target>/mols.lmdb` and `pockets.lmdb`.

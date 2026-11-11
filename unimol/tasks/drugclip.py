@@ -633,10 +633,7 @@ class DrugCLIP(UnicoreTask):
         
         # generate mol data
         
-        mol_data = torch.utils.data.DataLoader(
-            mol_dataset, batch_size=bsz, collate_fn=mol_dataset.collater,
-            num_workers=getattr(self.args, "num_workers", 0),
-        )
+        mol_data = torch.utils.data.DataLoader(mol_dataset, batch_size=bsz, collate_fn=mol_dataset.collater)
         for _, sample in enumerate(tqdm(mol_data)):
             sample = move_to_device(sample, next(model.parameters()).device)
             dist = sample["net_input"]["mol_src_distance"]
@@ -667,10 +664,7 @@ class DrugCLIP(UnicoreTask):
         # generate pocket data
         data_path = "./data/lit_pcba/" + name + "/pockets.lmdb"
         pocket_dataset = self.load_pockets_dataset(data_path)
-        pocket_data = torch.utils.data.DataLoader(
-            pocket_dataset, batch_size=bsz, collate_fn=pocket_dataset.collater,
-            num_workers=getattr(self.args, "num_workers", 0),
-        )
+        pocket_data = torch.utils.data.DataLoader(pocket_dataset, batch_size=bsz, collate_fn=pocket_dataset.collater)
         pocket_reps = []
 
         for _, sample in enumerate(tqdm(pocket_data)):
@@ -779,10 +773,7 @@ class DrugCLIP(UnicoreTask):
         
         # generate mol data
         
-        mol_data = torch.utils.data.DataLoader(
-            mol_dataset, batch_size=bsz, collate_fn=mol_dataset.collater,
-            num_workers=getattr(self.args, "num_workers", 0),
-        )
+        mol_data = torch.utils.data.DataLoader(mol_dataset, batch_size=bsz, collate_fn=mol_dataset.collater)
         for _, sample in enumerate(tqdm(mol_data)):
             sample = move_to_device(sample, next(model.parameters()).device)
             dist = sample["net_input"]["mol_src_distance"]
@@ -814,10 +805,7 @@ class DrugCLIP(UnicoreTask):
         # generate pocket data
         data_path = "./data/DUD-E/raw/all/" + target + "/pocket.lmdb"
         pocket_dataset = self.load_pockets_dataset(data_path)
-        pocket_data = torch.utils.data.DataLoader(
-            pocket_dataset, batch_size=bsz, collate_fn=pocket_dataset.collater,
-            num_workers=getattr(self.args, "num_workers", 0),
-        )
+        pocket_data = torch.utils.data.DataLoader(pocket_dataset, batch_size=bsz, collate_fn=pocket_dataset.collater)
         pocket_reps = []
 
         for _, sample in enumerate(tqdm(pocket_data)):
@@ -924,10 +912,7 @@ class DrugCLIP(UnicoreTask):
         mol_reps = []
         mol_names = []
         bsz=32
-        mol_data = torch.utils.data.DataLoader(
-            mol_dataset, batch_size=bsz, collate_fn=mol_dataset.collater,
-            num_workers=getattr(self.args, "num_workers", 0),
-        )
+        mol_data = torch.utils.data.DataLoader(mol_dataset, batch_size=bsz, collate_fn=mol_dataset.collater)
         for _, sample in enumerate(tqdm(mol_data)):
             sample = move_to_device(sample, next(model.parameters()).device)
             dist = sample["net_input"]["mol_src_distance"]
@@ -967,10 +952,7 @@ class DrugCLIP(UnicoreTask):
         mol_reps, mol_names = self.encode_mols_once(model, mol_path, emb_dir,  "atoms", "coordinates")
         
         pocket_dataset = self.load_pockets_dataset(pocket_path)
-        pocket_data = torch.utils.data.DataLoader(
-            pocket_dataset, batch_size=16, collate_fn=pocket_dataset.collater,
-            num_workers=getattr(self.args, "num_workers", 0),
-        )
+        pocket_data = torch.utils.data.DataLoader(pocket_dataset, batch_size=16, collate_fn=pocket_dataset.collater)
         pocket_reps = []
         pocket_names = []
         for _, sample in enumerate(tqdm(pocket_data)):

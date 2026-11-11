@@ -33,7 +33,6 @@ def cpu_fixture(tmp_path, monkeypatch):
     settings = Namespace(
         data=str(ROOT / "data"), task="drugclip", arch="drugclip", seed=1,
         device="cpu", cpu=False, device_id=0, fp16=False, bf16=False,
-        num_workers=0,
         max_seq_len=512, max_pocket_atoms=256,
         finetune_mol_model=None, finetune_pocket_model=None,
         mol_encoder_layers=1, mol_encoder_embed_dim=16,
@@ -115,39 +114,6 @@ def test_cpu_retrieval_entrypoint(cpu_fixture):
     lines = (Path(settings.emb_dir) / "ranked_compounds.txt").read_text().splitlines()
     assert len(lines) == 220
     assert all(len(line.split("\t")) == 2 for line in lines)
-
-
-def test_worker_count_reaches_all_inference_loaders(cpu_fixture, monkeypatch):
-    settings, task, model = cpu_fixture
-    settings.num_workers = 3
-    requested = []
-    original = torch.utils.data.DataLoader
-
-    def record_worker_count(*args, **kwargs):
-        requested.append(kwargs.get("num_workers"))
-        # Validate forwarding across all paths without spawning six worker pools.
-        kwargs["num_workers"] = 0
-        return original(*args, **kwargs)
-
-    monkeypatch.setattr(torch.utils.data, "DataLoader", record_worker_count)
-    task.test_dude_target("fixture", model)
-    task.test_pcba_target("fixture", model)
-    task.retrieve_mols(model, settings.mol_path, settings.pocket_path, settings.emb_dir, 10)
-    assert requested == [3] * 6
-
-
-def test_preprocessing_workers_preserve_retrieval_results(cpu_fixture):
-    settings, task, model = cpu_fixture
-    mol_path = Path(settings.mol_path).as_posix()
-    pocket_path = Path(settings.pocket_path).as_posix()
-    settings.num_workers = 1
-    worker_names, worker_scores = task.retrieve_mols(
-        model, mol_path, pocket_path, (Path(settings.emb_dir) / "workers").as_posix(), 220)
-    settings.num_workers = 0
-    serial_names, serial_scores = task.retrieve_mols(
-        model, mol_path, pocket_path, (Path(settings.emb_dir) / "serial").as_posix(), 220)
-    assert worker_names == serial_names
-    np.testing.assert_allclose(worker_scores, serial_scores, rtol=1e-6, atol=1e-7)
 
 
 @pytest.mark.parametrize("entrypoint", [retrieval, benchmark])
