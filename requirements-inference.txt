@@ -1,10 +1,10 @@
 # Install your hardware-specific PyTorch build before building UniCore.
-torch>=2.0
-numpy<2
+torch
+numpy
 scipy
 pandas
 scikit-learn
-rdkit==2022.9.5
+rdkit
 ipython
 iopath
 lmdb
