@@ -15,20 +15,37 @@ same as [Uni-Mol](https://github.com/dptech-corp/Uni-Mol/tree/main/unimol)
 
 **rdkit version should be 2022.9.5**
 
+### Install UniCore and DrugCLIP from GitHub
+
+The `drugclip` distribution provides the `unimol` package from this
+repository. With Python 3.10 or 3.11, Git, setuptools (version 68 or newer),
+PyTorch, and the other runtime dependencies already available, install both
+packages:
+
+```bash
+python -m pip install --no-build-isolation --no-deps "git+https://github.com/dptech-corp/Uni-Core.git@ace6fae1c8479a9751f2bb1e1d6e4047427bc134"
+python -m pip install --no-build-isolation --no-deps "git+https://github.com/simdeistud/DrugCLIP.git"
+```
+
+From a directory outside the repository, verify the installed imports:
+
+```bash
+python -c "from unicore.data import Dictionary as TokenDictionary; from unicore import checkpoint_utils; from unimol.models import BindingAffinityModel"
+```
+
 ### Inference without CUDA
 
-Inference supports CPU and available PyTorch accelerator backends. Training is
-unchanged. The following installation uses Python 3.10, CPU-only PyTorch, and
-UniCore without compiling CUDA extensions:
+For a new CPU environment, install the dependencies before building UniCore:
 
 ```bash
 python3.10 -m venv .venv
 source .venv/bin/activate  # Windows PowerShell: .venv\Scripts\Activate.ps1
-python -m pip install --upgrade pip setuptools wheel
+python -m pip install --upgrade pip "setuptools>=68" wheel
 python -m pip install torch==2.6.0 --index-url https://download.pytorch.org/whl/cpu
 python -m pip install -r requirements-inference.txt
-python -m pip install --no-build-isolation --no-deps "git+https://github.com/dptech-corp/Uni-Core.git@ace6fae1c8479a9751f2bb1e1d6e4047427bc134"
 ```
+
+Then run the two GitHub installation commands above.
 
 This UniCore revision defaults to disabling CUDA extensions; do not add
 `--enable-cuda-ext`. Its layer normalization and softmax implementations fall

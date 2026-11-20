@@ -1,4 +1,5 @@
-# Install a PyTorch build for your hardware separately, then UniCore (see README).
+# Install your hardware-specific PyTorch build before building UniCore.
+torch>=2.0
 numpy<2
 scipy
 pandas
@@ -12,3 +13,5 @@ tensorboardX
 tqdm
 tokenizers
 wandb
+networkx
+selfies

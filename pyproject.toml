@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "drugclip"
+version = "0.1.0"
+description = "Contrastive protein-molecule representation learning for virtual screening"
+readme = "README.md"
+requires-python = ">=3.10,<3.12"
+dynamic = ["dependencies"]
+
+[tool.setuptools.packages.find]
+include = ["unimol", "unimol.*"]
+namespaces = false
+
+[tool.setuptools.dynamic]
+dependencies = { file = ["requirements-inference.txt"] }

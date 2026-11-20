@@ -1,0 +1,2 @@
+include requirements-inference.txt
+include data/dict_mol.txt data/dict_pkt.txt
