@@ -7,7 +7,7 @@ name = "drugclip"
 version = "0.1.0"
 description = "Contrastive protein-molecule representation learning for virtual screening"
 readme = "README.md"
-requires-python = ">=3.10,<3.12"
+requires-python = ">=3.10"
 dynamic = ["dependencies"]
 
 [tool.setuptools.packages.find]
